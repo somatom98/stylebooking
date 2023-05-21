@@ -21,8 +21,27 @@ func main() {
 	})
 
 	router.GET("/products", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"products": []string{"cut", "nails", "wax"},
+		c.JSON(http.StatusOK, []map[string]string{
+			{
+				"name":        "cut",
+				"description": "cut hair",
+				"price":       "10",
+			},
+			{
+				"name":        "nails",
+				"description": "cut nails",
+				"price":       "5",
+			},
+			{
+				"name":        "wax",
+				"description": "wax hair",
+				"price":       "15",
+			},
+			{
+				"name":        "shave",
+				"description": "shave hair",
+				"price":       "10",
+			},
 		})
 	})
 

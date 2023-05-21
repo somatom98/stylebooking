@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:stylebooking_app/src/models/product.dart';
 
 // ignore: must_be_immutable
 class Products extends StatelessWidget {
-  List<String> products;
+  List<ProductViewModel> products;
 
   Products(this.products, {super.key});
 
@@ -21,9 +22,9 @@ class Products extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: <Widget>[
-                    Image.asset('assets/${x.toLowerCase()}.png'),
+                    Image.asset('assets/${x.name.toLowerCase()}.png'),
                     Text(
-                      x,
+                      x.name,
                       style: const TextStyle(
                         fontSize: 64,
                         fontWeight: FontWeight.bold,
