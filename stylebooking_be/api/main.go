@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/somatom98/stylebooking/stylebooking_be/config"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,9 +16,10 @@ import (
 )
 
 func main() {
+	c := config.GetConfig()
 
 	// set up mongo client
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://user:password@free.qko2zsp.mongodb.net/"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(c.Mongo.ConnectionString))
 	if err != nil {
 		panic(err)
 	}
