@@ -8,29 +8,39 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	stylebooking "github.com/somatom98/stylebooking/stylebooking_be"
 	"github.com/somatom98/stylebooking/stylebooking_be/config"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/somatom98/stylebooking/stylebooking_be/repositories"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func main() {
+var router *gin.Engine
+var mongoClient *mongo.Client
+var serviceRepository stylebooking.ServiceRepository
+
+func init() {
 	c := config.GetConfig()
 
 	// set up mongo client
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(c.Mongo.ConnectionString))
+	var err error
+	mongoClient, err = mongo.Connect(context.Background(), options.Client().ApplyURI(c.Mongo.ConnectionString))
 	if err != nil {
 		panic(err)
 	}
-	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
+	if err := mongoClient.Ping(context.Background(), readpref.Primary()); err != nil {
 		panic(err)
 	}
-	servicesCollection := client.Database("stylebooking").Collection("services")
+
+	// set up repositories
+	serviceRepository = repositories.NewMongoServiceRepository(mongoClient)
 
 	// set up router
-	router := gin.Default()
+	router = gin.Default()
+}
 
+func main() {
 	// set up routes
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -39,22 +49,8 @@ func main() {
 	})
 
 	router.GET("/products", func(c *gin.Context) {
-		filter := bson.M{}
-		cur, err := servicesCollection.Find(context.Background(), filter)
+		services, err := serviceRepository.GetAll(context.Background())
 		if err != nil {
-			panic(err)
-		}
-		defer cur.Close(context.Background())
-
-		var services []map[string]interface{}
-		for cur.Next(context.Background()) {
-			var service map[string]interface{}
-			if err := cur.Decode(&service); err != nil {
-				panic(err)
-			}
-			services = append(services, service)
-		}
-		if err := cur.Err(); err != nil {
 			panic(err)
 		}
 
