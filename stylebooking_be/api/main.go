@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	stylebooking "github.com/somatom98/stylebooking/stylebooking_be"
 	"github.com/somatom98/stylebooking/stylebooking_be/config"
+	"github.com/somatom98/stylebooking/stylebooking_be/models"
 	"github.com/somatom98/stylebooking/stylebooking_be/repositories"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -48,13 +49,36 @@ func main() {
 		})
 	})
 
-	router.GET("/products", func(c *gin.Context) {
+	router.GET("/services", func(c *gin.Context) {
 		services, err := serviceRepository.GetAll(context.Background())
 		if err != nil {
 			panic(err)
 		}
 
 		c.JSON(http.StatusOK, services)
+	})
+
+	router.GET("/services/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		service, err := serviceRepository.GetById(context.Background(), id)
+		if err != nil {
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, service)
+	})
+
+	router.POST("/services", func(c *gin.Context) {
+		var service models.Service
+		if err := c.ShouldBindJSON(&service); err != nil {
+			panic(err)
+		}
+
+		if err := serviceRepository.Create(context.Background(), service); err != nil {
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, service)
 	})
 
 	// set up port

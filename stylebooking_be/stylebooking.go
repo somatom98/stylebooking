@@ -8,6 +8,6 @@ import (
 
 type ServiceRepository interface {
 	GetAll(context.Context) ([]models.Service, error)
-	// GetById(id string) (models.Service, error)
-	// Create(service models.Service) error
+	GetById(context.Context, string) (models.Service, error)
+	Create(context.Context, models.Service) error
 }
