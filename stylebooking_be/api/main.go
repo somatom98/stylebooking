@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	stylebooking "github.com/somatom98/stylebooking/stylebooking_be"
@@ -17,16 +15,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+var conf config.Configuration
 var router *gin.Engine
 var mongoClient *mongo.Client
 var serviceRepository stylebooking.ServiceRepository
 
 func init() {
-	c := config.GetConfig()
+	conf = config.GetConfig()
 
 	// set up mongo client
 	var err error
-	mongoClient, err = mongo.Connect(context.Background(), options.Client().ApplyURI(c.Mongo.ConnectionString))
+	mongoClient, err = mongo.Connect(context.Background(), options.Client().ApplyURI(conf.Mongo.ConnectionString))
 	if err != nil {
 		panic(err)
 	}
@@ -81,12 +80,6 @@ func main() {
 		c.JSON(http.StatusOK, service)
 	})
 
-	// set up port
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
 	// run server
-	log.Fatal(router.Run(fmt.Sprintf(":%s", port)))
+	log.Fatal(router.Run(conf.App.Addr))
 }

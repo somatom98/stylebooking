@@ -7,7 +7,12 @@ import (
 )
 
 type Configuration struct {
+	App   AppConfiguration
 	Mongo MongoConfiguration
+}
+
+type AppConfiguration struct {
+	Addr string
 }
 
 type MongoConfiguration struct {
