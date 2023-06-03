@@ -8,8 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	stylebooking "github.com/somatom98/stylebooking/stylebooking_be"
 	"github.com/somatom98/stylebooking/stylebooking_be/config"
+	"github.com/somatom98/stylebooking/stylebooking_be/controllers"
 	"github.com/somatom98/stylebooking/stylebooking_be/models"
 	"github.com/somatom98/stylebooking/stylebooking_be/repositories"
+	"github.com/somatom98/stylebooking/stylebooking_be/services"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -19,6 +21,9 @@ var conf config.Configuration
 var router *gin.Engine
 var mongoClient *mongo.Client
 var serviceRepository stylebooking.ServiceRepository
+var storeRepository stylebooking.StoreRepository
+var storeService stylebooking.StoreService
+var storeController *controllers.StoreController
 
 func init() {
 	conf = config.GetConfig()
@@ -35,6 +40,13 @@ func init() {
 
 	// set up repositories
 	serviceRepository = repositories.NewMongoServiceRepository(mongoClient)
+	storeRepository = repositories.NewMongoStoreRepository(mongoClient)
+
+	// set up services
+	storeService = services.NewStoreService(storeRepository)
+
+	// set up controllers
+	storeController = controllers.NewStoreController(storeService)
 
 	// set up router
 	router = gin.Default()
@@ -47,6 +59,12 @@ func main() {
 			"message": "Hello World!",
 		})
 	})
+
+	router.GET("/stores", storeController.GetAll)
+
+	router.GET("/stores/:id", storeController.GetById)
+
+	router.POST("/stores", storeController.Create)
 
 	router.GET("/services", func(c *gin.Context) {
 		services, err := serviceRepository.GetAll(context.Background())
