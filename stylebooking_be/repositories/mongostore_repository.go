@@ -79,9 +79,12 @@ func (r *MongoStoreRepository) AddService(ctx context.Context, storeId string, s
 
 	filter := bson.M{"_id": oid}
 	update := bson.M{"$push": bson.M{"services": service}}
-	_, err = r.collection.UpdateOne(ctx, filter, update)
+	result, err := r.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
+	}
+	if result.ModifiedCount == 0 {
+		return sb.ErrStoreNotFound{Id: storeId}
 	}
 	return nil
 }
@@ -93,9 +96,12 @@ func (r *MongoStoreRepository) UpdateService(ctx context.Context, storeId string
 	}
 	filter := bson.M{"_id": oid, "services._id": serviceId}
 	update := bson.M{"$set": bson.M{"services.$": service}}
-	_, err = r.collection.UpdateOne(ctx, filter, update)
+	result, err := r.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
+	}
+	if result.ModifiedCount == 0 {
+		return sb.ErrServiceNotFound{Id: storeId, StoreId: serviceId}
 	}
 	return nil
 }
@@ -111,9 +117,12 @@ func (r *MongoStoreRepository) DeleteService(ctx context.Context, storeId string
 	}
 	filter := bson.M{"_id": oid}
 	update := bson.M{"$pull": bson.M{"services": bson.M{"_id": soid}}}
-	_, err = r.collection.UpdateOne(ctx, filter, update)
+	result, err := r.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
+	}
+	if result.ModifiedCount == 0 {
+		return sb.ErrServiceNotFound{Id: storeId, StoreId: serviceId}
 	}
 	return nil
 }

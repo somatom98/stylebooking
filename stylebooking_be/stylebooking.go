@@ -30,3 +30,20 @@ type StoreService interface {
 	UpdateService(context.Context, string, string, vm.Service) error
 	DeleteService(context.Context, string, string) error
 }
+
+type ErrStoreNotFound struct {
+	Id string
+}
+
+func (e ErrStoreNotFound) Error() string {
+	return "Store with id " + e.Id + " not found"
+}
+
+type ErrServiceNotFound struct {
+	Id      string
+	StoreId string
+}
+
+func (e ErrServiceNotFound) Error() string {
+	return "Service with id " + e.Id + " not found in store with id " + e.StoreId
+}
