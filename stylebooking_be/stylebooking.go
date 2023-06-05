@@ -50,7 +50,7 @@ type StoreService interface {
 type CustomerService interface {
 	GetById(context.Context, string) (models.Customer, error)
 	SignUp(context.Context, vm.SignUpRequest) (vm.SignUpResponse, error)
-	SignIn(context.Context, vm.SignInRequest) (vm.Token, error)
+	LogIn(context.Context, vm.SignInRequest) (vm.Token, error)
 }
 
 type AuthenticationService interface {

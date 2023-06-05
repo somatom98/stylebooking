@@ -94,7 +94,7 @@ func main() {
 
 	router.POST("/customers/signup", customerController.SignUp)
 
-	router.POST("/customers/signin", customerController.SignIn)
+	router.POST("/customers/login", customerController.LogIn)
 
 	// run server
 	log.Fatal(router.Run(conf.App.Addr))

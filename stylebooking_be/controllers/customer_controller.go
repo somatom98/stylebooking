@@ -52,7 +52,7 @@ func (c *CustomerController) SignUp(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (c *CustomerController) SignIn(ctx *gin.Context) {
+func (c *CustomerController) LogIn(ctx *gin.Context) {
 	var request vm.SignInRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -61,7 +61,7 @@ func (c *CustomerController) SignIn(ctx *gin.Context) {
 		return
 	}
 
-	token, err := c.customerService.SignIn(ctx.Request.Context(), request)
+	token, err := c.customerService.LogIn(ctx.Request.Context(), request)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),

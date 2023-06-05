@@ -48,7 +48,7 @@ func (s *CustomerService) SignUp(ctx context.Context, request vm.SignUpRequest) 
 	return vm.SignUpResponse{ID: id}, nil
 }
 
-func (s *CustomerService) SignIn(ctx context.Context, request vm.SignInRequest) (vm.Token, error) {
+func (s *CustomerService) LogIn(ctx context.Context, request vm.SignInRequest) (vm.Token, error) {
 	customer, err := s.customerRepository.GetByEmail(ctx, request.Email)
 	if err != nil {
 		return vm.Token{}, err
