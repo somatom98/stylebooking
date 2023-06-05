@@ -4,5 +4,12 @@
     },
     "Mongo": {
         "ConnectionString": "mongodb+srv://usr:pwd@free.qko2zsp.mongodb.net/"
+    },
+    "Jwt": {
+        "Secret": "secret",
+        "Issuer": "somatom",
+        "Audience": "somatom",
+        "AccessTokenDuration": 3600,
+        "RefreshTokenDuration": 86400
     }
 }

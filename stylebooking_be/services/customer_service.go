@@ -9,12 +9,14 @@ import (
 )
 
 type CustomerService struct {
-	customerRepository sb.CustomerRepository
+	customerRepository    sb.CustomerRepository
+	authenticationService sb.AuthenticationService
 }
 
-func NewCustomerService(customerRepository sb.CustomerRepository) *CustomerService {
+func NewCustomerService(customerRepository sb.CustomerRepository, authenticationService sb.AuthenticationService) *CustomerService {
 	return &CustomerService{
-		customerRepository: customerRepository,
+		customerRepository:    customerRepository,
+		authenticationService: authenticationService,
 	}
 }
 
@@ -41,22 +43,21 @@ func (s *CustomerService) SignUp(ctx context.Context, request vm.SignUpRequest) 
 		return vm.SignUpResponse{}, err
 	}
 
+	s.authenticationService.CreatePassword(ctx, id, request.Password)
+
 	return vm.SignUpResponse{ID: id}, nil
 }
 
-func (s *CustomerService) SignIn(ctx context.Context, request vm.SignInRequest) (vm.SignInResponse, error) {
+func (s *CustomerService) SignIn(ctx context.Context, request vm.SignInRequest) (vm.Token, error) {
 	customer, err := s.customerRepository.GetByEmail(ctx, request.Email)
 	if err != nil {
-		return vm.SignInResponse{}, err
+		return vm.Token{}, err
 	}
 
-	if customer.Password != request.Password {
-		return vm.SignInResponse{}, sb.ErrWrongPassword{}
+	token, err := s.authenticationService.Authenticate(ctx, customer.ID.Hex(), request.Password)
+	if err != nil {
+		return vm.Token{}, err
 	}
 
-	response := vm.SignInResponse{
-		Token: "token",
-	}
-
-	return response, nil
+	return token, nil
 }

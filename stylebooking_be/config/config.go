@@ -9,6 +9,7 @@ import (
 type Configuration struct {
 	App   AppConfiguration
 	Mongo MongoConfiguration
+	Jwt   JwtConfiguration
 }
 
 type AppConfiguration struct {
@@ -17,6 +18,14 @@ type AppConfiguration struct {
 
 type MongoConfiguration struct {
 	ConnectionString string
+}
+
+type JwtConfiguration struct {
+	Secret               string
+	Issuer               string
+	Audience             string
+	AccessTokenDuration  int
+	RefreshTokenDuration int
 }
 
 func GetConfig(params ...string) Configuration {

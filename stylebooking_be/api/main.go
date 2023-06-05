@@ -26,6 +26,8 @@ var storeService stylebooking.StoreService
 var customerService stylebooking.CustomerService
 var storeController *controllers.StoreController
 var customerController *controllers.CustomerController
+var authenticationRepository stylebooking.AuthenticationRepository
+var authenticationService stylebooking.AuthenticationService
 
 func init() {
 	conf = config.GetConfig()
@@ -44,10 +46,12 @@ func init() {
 	serviceRepository = repositories.NewMongoServiceRepository(mongoClient)
 	storeRepository = repositories.NewMongoStoreRepository(mongoClient)
 	customerRepository = repositories.NewMongoCustomerRepository(mongoClient)
+	authenticationRepository = repositories.NewMongoAuthenticationRepository(mongoClient)
 
 	// set up services
 	storeService = services.NewStoreService(storeRepository)
-	customerService = services.NewCustomerService(customerRepository)
+	authenticationService = services.NewAuthenticationService(authenticationRepository, customerRepository, conf.Jwt)
+	customerService = services.NewCustomerService(customerRepository, authenticationService)
 
 	// set up controllers
 	storeController = controllers.NewStoreController(storeService)

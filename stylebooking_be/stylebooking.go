@@ -31,6 +31,13 @@ type CustomerRepository interface {
 	Delete(context.Context, string) error
 }
 
+type AuthenticationRepository interface {
+	GetByCustomerId(context.Context, string) (models.Authentication, error)
+	Create(context.Context, models.Authentication) error
+	Delete(context.Context, string) error
+	Update(context.Context, string, models.Authentication) error
+}
+
 type StoreService interface {
 	GetAll(context.Context) ([]vm.Store, error)
 	GetById(context.Context, string) (vm.Store, error)
@@ -43,7 +50,14 @@ type StoreService interface {
 type CustomerService interface {
 	GetById(context.Context, string) (models.Customer, error)
 	SignUp(context.Context, vm.SignUpRequest) (vm.SignUpResponse, error)
-	SignIn(context.Context, vm.SignInRequest) (vm.SignInResponse, error)
+	SignIn(context.Context, vm.SignInRequest) (vm.Token, error)
+}
+
+type AuthenticationService interface {
+	Authenticate(context.Context, string, string) (vm.Token, error)
+	Refresh(context.Context, string, string) (vm.Token, error)
+	CreatePassword(context.Context, string, string) error
+	UpdatePassword(context.Context, string, string) error
 }
 
 type ErrStoreNotFound struct {
@@ -75,4 +89,10 @@ type ErrCustomerNotFound struct {
 
 func (e ErrCustomerNotFound) Error() string {
 	return "Customer with id " + e.Id + " not found"
+}
+
+type ErrInvalidToken struct{}
+
+func (e ErrInvalidToken) Error() string {
+	return "Invalid token"
 }
