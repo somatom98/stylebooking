@@ -27,17 +27,7 @@ func (c *StoreController) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	var viewmodels []vm.Store
-	for _, store := range stores {
-		viewmodels = append(viewmodels, vm.Store{
-			Name:        store.Name,
-			Description: store.Description,
-			Location:    store.Location,
-			Hours:       store.Hours,
-		})
-	}
-
-	ctx.JSON(http.StatusOK, viewmodels)
+	ctx.JSON(http.StatusOK, stores)
 }
 
 func (c *StoreController) GetById(ctx *gin.Context) {
@@ -51,14 +41,7 @@ func (c *StoreController) GetById(ctx *gin.Context) {
 		return
 	}
 
-	viewmodel := vm.Store{
-		Name:        store.Name,
-		Description: store.Description,
-		Location:    store.Location,
-		Hours:       store.Hours,
-	}
-
-	ctx.JSON(http.StatusOK, viewmodel)
+	ctx.JSON(http.StatusOK, store)
 }
 
 func (c *StoreController) Create(ctx *gin.Context) {
@@ -78,4 +61,61 @@ func (c *StoreController) Create(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, store)
+}
+
+func (c *StoreController) AddService(ctx *gin.Context) {
+	storeId := ctx.Param("id")
+
+	var service vm.Service
+	if err := ctx.ShouldBindJSON(&service); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := c.storeService.AddService(ctx.Request.Context(), storeId, service); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, service)
+}
+
+func (c *StoreController) UpdateService(ctx *gin.Context) {
+	storeId := ctx.Param("id")
+	serviceId := ctx.Param("serviceId")
+
+	var service vm.Service
+	if err := ctx.ShouldBindJSON(&service); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := c.storeService.UpdateService(ctx.Request.Context(), storeId, serviceId, service); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, service)
+}
+
+func (c *StoreController) DeleteService(ctx *gin.Context) {
+	storeId := ctx.Param("id")
+	serviceId := ctx.Param("serviceId")
+
+	if err := c.storeService.DeleteService(ctx.Request.Context(), storeId, serviceId); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{})
 }

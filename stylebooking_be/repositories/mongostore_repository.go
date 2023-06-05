@@ -68,3 +68,52 @@ func (r *MongoStoreRepository) Create(ctx context.Context, store models.Store) e
 	}
 	return nil
 }
+
+func (r *MongoStoreRepository) AddService(ctx context.Context, storeId string, service models.Service) error {
+	oid, err := primitive.ObjectIDFromHex(storeId)
+	if err != nil {
+		return err
+	}
+
+	service.ID = primitive.NewObjectID()
+
+	filter := bson.M{"_id": oid}
+	update := bson.M{"$push": bson.M{"services": service}}
+	_, err = r.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *MongoStoreRepository) UpdateService(ctx context.Context, storeId string, serviceId string, service models.Service) error {
+	oid, err := primitive.ObjectIDFromHex(storeId)
+	if err != nil {
+		return err
+	}
+	filter := bson.M{"_id": oid, "services._id": serviceId}
+	update := bson.M{"$set": bson.M{"services.$": service}}
+	_, err = r.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *MongoStoreRepository) DeleteService(ctx context.Context, storeId string, serviceId string) error {
+	oid, err := primitive.ObjectIDFromHex(storeId)
+	if err != nil {
+		return err
+	}
+	soid, err := primitive.ObjectIDFromHex(serviceId)
+	if err != nil {
+		return err
+	}
+	filter := bson.M{"_id": oid}
+	update := bson.M{"$pull": bson.M{"services": bson.M{"_id": soid}}}
+	_, err = r.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
+}

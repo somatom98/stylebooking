@@ -17,10 +17,16 @@ type StoreRepository interface {
 	GetAll(context.Context) ([]models.Store, error)
 	GetById(context.Context, string) (models.Store, error)
 	Create(context.Context, models.Store) error
+	AddService(context.Context, string, models.Service) error
+	UpdateService(context.Context, string, string, models.Service) error
+	DeleteService(context.Context, string, string) error
 }
 
 type StoreService interface {
 	GetAll(context.Context) ([]vm.Store, error)
 	GetById(context.Context, string) (vm.Store, error)
 	Create(context.Context, vm.Store) error
+	AddService(context.Context, string, vm.Service) error
+	UpdateService(context.Context, string, string, vm.Service) error
+	DeleteService(context.Context, string, string) error
 }

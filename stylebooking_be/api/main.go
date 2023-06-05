@@ -9,7 +9,6 @@ import (
 	stylebooking "github.com/somatom98/stylebooking/stylebooking_be"
 	"github.com/somatom98/stylebooking/stylebooking_be/config"
 	"github.com/somatom98/stylebooking/stylebooking_be/controllers"
-	"github.com/somatom98/stylebooking/stylebooking_be/models"
 	"github.com/somatom98/stylebooking/stylebooking_be/repositories"
 	"github.com/somatom98/stylebooking/stylebooking_be/services"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -66,6 +65,12 @@ func main() {
 
 	router.POST("/stores", storeController.Create)
 
+	router.POST("/stores/:id/services", storeController.AddService)
+
+	router.DELETE("/stores/:id/services/:serviceId", storeController.DeleteService)
+
+	router.PATCH("/stores/:id/services/:serviceId", storeController.UpdateService)
+
 	router.GET("/services", func(c *gin.Context) {
 		services, err := serviceRepository.GetAll(context.Background())
 		if err != nil {
@@ -73,29 +78,6 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, services)
-	})
-
-	router.GET("/services/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		service, err := serviceRepository.GetById(context.Background(), id)
-		if err != nil {
-			panic(err)
-		}
-
-		c.JSON(http.StatusOK, service)
-	})
-
-	router.POST("/services", func(c *gin.Context) {
-		var service models.Service
-		if err := c.ShouldBindJSON(&service); err != nil {
-			panic(err)
-		}
-
-		if err := serviceRepository.Create(context.Background(), service); err != nil {
-			panic(err)
-		}
-
-		c.JSON(http.StatusOK, service)
 	})
 
 	// run server

@@ -25,12 +25,9 @@ func (s *StoreService) GetAll(ctx context.Context) ([]vm.Store, error) {
 
 	var viewmodels []vm.Store
 	for _, store := range stores {
-		viewmodels = append(viewmodels, vm.Store{
-			Name:        store.Name,
-			Description: store.Description,
-			Location:    store.Location,
-			Hours:       store.Hours,
-		})
+		storeVM := vm.Store{}
+		storeVM.FromModel(store)
+		viewmodels = append(viewmodels, storeVM)
 	}
 
 	return viewmodels, nil
@@ -50,4 +47,16 @@ func (s *StoreService) GetById(ctx context.Context, id string) (vm.Store, error)
 
 func (s *StoreService) Create(ctx context.Context, store vm.Store) error {
 	return s.storeRepository.Create(ctx, store.ToModel())
+}
+
+func (s *StoreService) AddService(ctx context.Context, storeId string, service vm.Service) error {
+	return s.storeRepository.AddService(ctx, storeId, service.ToModel())
+}
+
+func (s *StoreService) UpdateService(ctx context.Context, storeId string, serviceId string, service vm.Service) error {
+	return s.storeRepository.UpdateService(ctx, storeId, serviceId, service.ToModel())
+}
+
+func (s *StoreService) DeleteService(ctx context.Context, storeId string, serviceId string) error {
+	return s.storeRepository.DeleteService(ctx, storeId, serviceId)
 }
