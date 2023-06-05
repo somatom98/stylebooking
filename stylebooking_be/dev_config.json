@@ -1,0 +1,8 @@
+{
+    "App": {
+        "Addr": ":8080"
+    },
+    "Mongo": {
+        "ConnectionString": "mongodb+srv://usr:pwd@free.qko2zsp.mongodb.net/"
+    }
+}
