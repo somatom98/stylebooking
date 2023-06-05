@@ -22,6 +22,15 @@ type StoreRepository interface {
 	DeleteService(context.Context, string, string) error
 }
 
+type CustomerRepository interface {
+	GetAll(context.Context) ([]models.Customer, error)
+	GetById(context.Context, string) (models.Customer, error)
+	GetByEmail(context.Context, string) (models.Customer, error)
+	Create(context.Context, models.Customer) (string, error)
+	Update(context.Context, string, models.Customer) error
+	Delete(context.Context, string) error
+}
+
 type StoreService interface {
 	GetAll(context.Context) ([]vm.Store, error)
 	GetById(context.Context, string) (vm.Store, error)
@@ -29,6 +38,12 @@ type StoreService interface {
 	AddService(context.Context, string, vm.Service) error
 	UpdateService(context.Context, string, string, vm.Service) error
 	DeleteService(context.Context, string, string) error
+}
+
+type CustomerService interface {
+	GetById(context.Context, string) (models.Customer, error)
+	SignUp(context.Context, vm.SignUpRequest) (vm.SignUpResponse, error)
+	SignIn(context.Context, vm.SignInRequest) (vm.SignInResponse, error)
 }
 
 type ErrStoreNotFound struct {
@@ -46,4 +61,18 @@ type ErrServiceNotFound struct {
 
 func (e ErrServiceNotFound) Error() string {
 	return "Service with id " + e.Id + " not found in store with id " + e.StoreId
+}
+
+type ErrWrongPassword struct{}
+
+func (e ErrWrongPassword) Error() string {
+	return "Wrong password"
+}
+
+type ErrCustomerNotFound struct {
+	Id string
+}
+
+func (e ErrCustomerNotFound) Error() string {
+	return "Customer with id " + e.Id + " not found"
 }

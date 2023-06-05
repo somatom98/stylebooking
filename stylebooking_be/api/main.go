@@ -21,8 +21,11 @@ var router *gin.Engine
 var mongoClient *mongo.Client
 var serviceRepository stylebooking.ServiceRepository
 var storeRepository stylebooking.StoreRepository
+var customerRepository stylebooking.CustomerRepository
 var storeService stylebooking.StoreService
+var customerService stylebooking.CustomerService
 var storeController *controllers.StoreController
+var customerController *controllers.CustomerController
 
 func init() {
 	conf = config.GetConfig()
@@ -40,12 +43,15 @@ func init() {
 	// set up repositories
 	serviceRepository = repositories.NewMongoServiceRepository(mongoClient)
 	storeRepository = repositories.NewMongoStoreRepository(mongoClient)
+	customerRepository = repositories.NewMongoCustomerRepository(mongoClient)
 
 	// set up services
 	storeService = services.NewStoreService(storeRepository)
+	customerService = services.NewCustomerService(customerRepository)
 
 	// set up controllers
 	storeController = controllers.NewStoreController(storeService)
+	customerController = controllers.NewCustomerController(customerService)
 
 	// set up router
 	router = gin.Default()
@@ -79,6 +85,12 @@ func main() {
 
 		c.JSON(http.StatusOK, services)
 	})
+
+	router.GET("/customers/:id", customerController.GetById)
+
+	router.POST("/customers/signup", customerController.SignUp)
+
+	router.POST("/customers/signin", customerController.SignIn)
 
 	// run server
 	log.Fatal(router.Run(conf.App.Addr))
